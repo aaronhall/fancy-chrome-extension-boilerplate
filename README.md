@@ -1,4 +1,4 @@
-An opinionated Chrome extension boilerplate with some neat stuff:
+An opinionated Chrome extension boilerplate with some fancy tooling:
 
 * Supports ES6 via Babel and less
 * Live rebuild and reload of the extension on file changes for development (`gulp watch`)

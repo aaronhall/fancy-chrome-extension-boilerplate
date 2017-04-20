@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "manifest_version": 2,
   "description": "This extension was created with the awesome extensionizr.com",
-  "homepage_url": "http://extensionizr.com",
   "icons": {
     "16": "assets/icons/icon16.png",
     "48": "assets/icons/icon48.png",
@@ -11,7 +10,7 @@
   },
   "default_locale": "en",
   "background": {
-    "page": "lib/background.html",
+    "scripts": ["assets/js/background.js"],
     "persistent": true
   },
   "page_action": {
@@ -25,7 +24,7 @@
     "cookies",
     "notifications",
     "tabs",
-    "http?://*/*"
+    "*://*/*"
   ],
   "omnibox": {
     "keyword": "extensionizr"
@@ -33,18 +32,18 @@
   "content_scripts": [
     {
       "matches": [
-        "http?://*/*"
+        "*://*/*"
       ],
       "css": [
-        "css/page.css"
+        "assets/css/page.css"
       ]
     },
     {
       "matches": [
-        "http?://*/*"
+        "*://*/*"
       ],
       "js": [
-        "js/page.js"
+        "assets/js/page.js"
       ]
     }
   ]

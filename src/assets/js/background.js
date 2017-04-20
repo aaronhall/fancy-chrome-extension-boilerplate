@@ -1,8 +1,4 @@
 import jquery from "./vendor/jquery/dist/jquery";
-import foo from "./lib/foo";
-
-
-
 
 
 let b = [1, 2, 3]
@@ -14,8 +10,6 @@ let b = [1, 2, 3]
 //:
 
 for(let a of b) {
-  console.log(a);
-  console.log(a);
   console.log(a);
   console.log(a);
 }
