@@ -1,0 +1,1 @@
+{"version":3,"sources":["page.js"],"names":["console","log"],"mappings":";;AAAA;AACA;;AAEAA,QAAQC,GAAR,CAAY,OAAZ","file":"page.js","sourcesContent":["// asdf\n//\n\nconsole.log('hello');\n"]}
