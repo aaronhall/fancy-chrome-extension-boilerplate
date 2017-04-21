@@ -1,3 +1,5 @@
+**IN DEVELOPMENT**
+
 An opinionated Chrome extension boilerplate with some fancy tooling:
 
 * Supports ES6 via Babel and less
