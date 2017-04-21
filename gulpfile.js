@@ -11,27 +11,45 @@ const watch = require('gulp-watch');
 gulp.task('watch', function() {
   let
     s, // stream to return
-    rebuild = function(v, f) {
-      let relpath = './' + path.relative(process.cwd(), v.path);
-      let start = Date.now();
-      let s = f(v);
-      let onRebuildDone = () => {
-        server.emit('projectRebuilt', {});
-        gutil.log(`Rebuilt in`, gutil.colors.bold(gutil.colors.magenta(`${(Date.now()-start)/1000} sec`)));
-      };
+    running = new Set([]),
+    rerun = new Set([]),
+    rebuild = function(k, v, f) {
+      if(running.has(k)) {
+        rerun.add(k);
+        return;
+      } else {
+        running.add(k);
+        rerun.delete(k);
+      }
 
+      let
+        relpath = './' + path.relative(process.cwd(), v.path),
+        start = Date.now(),
+        onRebuildDone = () => {
+          gutil.log(`Rebuilt in`, gutil.colors.bold(gutil.colors.magenta(`${(Date.now()-start)/1000} sec`)));
+
+          running.delete(k);
+          if(rerun.has(k)) {
+            rebuild(k, v, f);
+          } else {
+            server.emit('serverRebuildDone', {});
+          }
+        }
+      ;
+
+      server.emit('serverRebuildStart', {});
       gutil.log(`Detected change in ${gutil.colors.cyan(relpath)}, rebuilding...`);
-
+      let s = f(v);
       if(s && s.on) s.on('end', onRebuildDone);
       else onRebuildDone();
     },
     defs = [
-      // [file glob to watch, build func]
-      ['src/assets/js/**/*.js', build.js('./build/dev/assets/js', true)], // js
-      ['src/assets/less/**/*.js', build.less('./build/dev/assets/css', true)], // less
-      ['src/manifest/*.json', build.manifest('./build/dev', true)], // manifest
-      ['src/assets/{html,images,icons}/**/*', build.assets('./build/dev/assets')], // other assets
-      ['src/assets/_locales/**/*', build.locales('./build/dev/_locales')], // locales
+      // [key, file glob to watch, build func]
+      ['js', 'src/assets/js/**/*.js', build.js('./build/dev/assets/js', true)], // js
+      ['less', 'src/assets/less/**/*.less', build.less('./build/dev/assets/css', true)], // less
+      ['manifest', 'src/manifest/*.json', build.manifest('./build/dev', true)], // manifest
+      ['assets', 'src/assets/{html,images,icons}/**/*', build.assets('./build/dev/assets')], // other assets
+      ['locales', 'src/assets/_locales/**/*', build.locales('./build/dev/_locales')], // locales
     ]
   ;
 
@@ -39,9 +57,9 @@ gulp.task('watch', function() {
   // TODO: handle deleted files?
 
   for(let def of defs) {
-    def[1]();
-    s = watch(def[0], function(v) {
-      rebuild(v, def[1]);
+    def[2]();
+    s = watch(def[1], function(v) {
+      rebuild(def[0], v, def[2]);
     });
   }
 
@@ -55,7 +73,6 @@ gulp.task('watch', function() {
   server.on('clientReloading', (socket) => {
     gutil.log("Extension is reloading...");
   });
-
 
   gutil.log("Project built in", gutil.colors.cyan('./build/dev'));
   gutil.log("Watching for changes...");
